@@ -25,6 +25,6 @@ async function bootstrap() {
    * to dto class & checks validity
    */
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  await app.listen(3000);
+  await app.listen(8800);
 }
 bootstrap();

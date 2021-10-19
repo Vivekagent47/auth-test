@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  forwardRef,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { User, CreateUserDto, UserService } from '../user';
 import { LoginCredential } from './login-credential.dto';
 import { TokenDto } from './token.dto';
