@@ -47,8 +47,6 @@ export class AuthService {
       throw new Error('Inactive user');
     }
     delete user.password;
-    delete user.createdAt;
-    delete user.updatedAt;
 
     const authToken: TokenDto = this.generateAuthToken(user);
     return Promise.resolve({ authToken, user });

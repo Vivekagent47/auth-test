@@ -7,6 +7,8 @@ import {
   HttpException,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Patch,
+  Body,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -48,6 +50,38 @@ export class UserController {
   async getAllUser(): Promise<User[]> {
     try {
       return await this.service.getAllUsers();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async updateUser(
+    @Param('id') id: number,
+    @Body() data: Partial<User>,
+  ): Promise<User> {
+    try {
+      return await this.service.updateUser(id, data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Patch('/passwordUpdate/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async updatePassword(
+    @Param('id') id: number,
+    @Body() data: { email: string; prvPassword: string; newPassword: string },
+  ): Promise<any> {
+    try {
+      return await this.service.updatePassword(id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

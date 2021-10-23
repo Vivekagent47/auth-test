@@ -84,4 +84,65 @@ export class UserService {
       });
     });
   }
+
+  /**
+   * Update user
+   */
+  async updateUser(id: number, data: Partial<any>) {
+    const user = await this.getUserById(id);
+
+    if (data.password || data.roles) {
+      throw new Error('Password or roles is not changed from this route');
+    }
+
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    await this.userRepository.update(id, data);
+
+    const newUser = await this.userRepository.findOne({ id });
+    delete newUser.password;
+    return newUser;
+  }
+
+  /**
+   * Update Password
+   */
+  async updatePassword(
+    id: number,
+    data: {
+      email: string;
+      prvPassword: string;
+      newPassword: string;
+    },
+  ) {
+    const user = await this.getUserByEmail(data.email);
+
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    if (id !== user.id) {
+      throw new Error('Invalid credentials');
+    }
+
+    const isMatched = await this.checkPassword(user, data.prvPassword);
+
+    if (!isMatched) {
+      throw new Error('Invalid Old Password');
+    }
+
+    const hashNew = await this.hashPassword(data.newPassword);
+
+    try {
+      await this.userRepository.update(user.id, { password: hashNew });
+      return {
+        success: true,
+        message: 'Password Changed Successfully',
+      };
+    } catch {
+      throw new Error('Some error');
+    }
+  }
 }
