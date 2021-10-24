@@ -1,5 +1,4 @@
 import {
-  Inject,
   Controller,
   Post,
   Body,
@@ -13,7 +12,7 @@ import { CreateUserDto, User } from '../user';
 import { LoginCredential } from './login-credential.dto';
 import { TokenDto } from './token.dto';
 import { RefreshTokenDto } from './refresh-token.dto';
-import { Logger } from 'winston';
+// import { Logger } from 'winston';
 
 /**
  * Auth controller
@@ -23,11 +22,7 @@ export class AuthController {
   /**
    * @ignore
    */
-  constructor(
-    @Inject('winston')
-    private readonly logger: Logger,
-    private readonly service: AuthService,
-  ) {}
+  constructor(private readonly service: AuthService) {}
 
   /**
    * Create new user
@@ -50,7 +45,7 @@ export class AuthController {
     try {
       return await this.service.login(credential);
     } catch (error) {
-      this.logger.warn('Login attempt failed', credential);
+      // this.logger.warn('Login attempt failed', credential);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -63,7 +58,7 @@ export class AuthController {
     try {
       return this.service.refreshToken(token);
     } catch (error) {
-      this.logger.warn('Refresh token attempt failed', token);
+      // this.logger.warn('Refresh token attempt failed', token);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
