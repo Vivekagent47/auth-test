@@ -14,7 +14,8 @@ describe('Auth Controller', () => {
    * Prepare mock data set
    */
   const mockUserData: CreateUserDto = {
-    name: 'Joe',
+    firstName: 'Joe',
+    lastName: 'Joe',
     email: 'joe@example.com',
     password: '123456',
   };

@@ -22,10 +22,16 @@ export class User {
   id: number;
 
   /**
-   * name
+   * first name
    */
-  @Column({ length: 100, nullable: false })
-  name: string;
+  @Column({ length: 50, nullable: false })
+  firstName: string;
+
+  /**
+   *last name
+   */
+  @Column({ length: 50, nullable: false })
+  lastName: string;
 
   /**
    * email

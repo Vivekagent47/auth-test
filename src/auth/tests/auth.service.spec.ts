@@ -1,15 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth.service';
 import { CreateUserDto, UserService } from '../../user';
 import { LoginCredential } from '../login-credential.dto';
-
-import { JwtService } from '@nestjs/jwt';
+// import { RefreshTokenDto } from '../refresh-token.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
 
   const mockUserData: CreateUserDto = {
-    name: 'Joe',
+    firstName: 'Joe',
+    lastName: 'Joe',
     email: 'joe@example.com',
     password: '123456',
   };
@@ -18,6 +19,10 @@ describe('AuthService', () => {
     email: mockUserData.email,
     password: mockUserData.password,
   };
+
+  // const mockRefreshToken: RefreshTokenDto = {
+  //   refreshToken: 'bla bla',
+  // };
 
   const mockUser = {
     id: 1,
@@ -34,6 +39,7 @@ describe('AuthService', () => {
     createUser: () => Promise.resolve(mockUser),
     getUserByEmail: () => Promise.resolve(mockUser),
     checkPassword: () => Promise.resolve(true),
+    // refreshToken: () => Promise.resolve(mockRefreshToken),
   };
 
   const mockJwtService = {
@@ -150,4 +156,14 @@ describe('AuthService', () => {
       );
     });
   });
+
+  // describe('Refresh Token', () => {
+  //   it('give new access token with prv refresh token', async () => {
+  //     jest.spyOn(mockUserService, 'refreshToken');
+  //     const user = await service.refreshToken(mockRefreshToken);
+
+  //     expect(mockUserService.refreshToken).toBeCalledWith(mockRefreshToken);
+  //     expect(user).toEqual(mockToken);
+  //   });
+  // });
 });

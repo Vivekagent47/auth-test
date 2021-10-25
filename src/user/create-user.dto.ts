@@ -6,12 +6,20 @@ import { ApiProperty } from '@nestjs/swagger';
  */
 export class CreateUserDto {
   /**
-   * user name
+   * user first name
    */
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(50)
   @ApiProperty()
-  readonly name: string;
+  readonly firstName: string;
+
+  /**
+   * user first name
+   */
+  @IsNotEmpty()
+  @MaxLength(50)
+  @ApiProperty()
+  readonly lastName: string;
 
   /**
    * user email

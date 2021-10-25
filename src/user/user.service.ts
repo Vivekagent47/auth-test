@@ -20,7 +20,8 @@ export class UserService {
    */
   async createUser(userData: CreateUserDto): Promise<User> {
     const user = new User();
-    user.name = userData.name;
+    user.firstName = userData.firstName;
+    user.lastName = userData.lastName;
     user.email = userData.email;
     user.roles = ['user'];
     user.isActive = true;
@@ -31,7 +32,7 @@ export class UserService {
     } catch (error) {
       // process email duplicate err msg
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new Error(`user already exists with email ${user.name}`);
+        throw new Error(`user already exists with email ${user.email}`);
       }
 
       throw error;

@@ -20,7 +20,8 @@ export interface IAuthUser {
   /**
    * optional user name
    */
-  name?: string;
+  firstName?: string;
+  lastName?: string;
 
   /**
    * user roles array
