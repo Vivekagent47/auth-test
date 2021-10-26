@@ -25,6 +25,9 @@ export class UserService {
     user.email = userData.email;
     user.roles = ['user'];
     user.isActive = true;
+    user.userType = userData.userType;
+    user.mobileNumber = userData.mobileNumber ? userData.mobileNumber : 0;
+    user.countryCode = userData.countryCode ? userData.countryCode : '';
     user.password = await this.hashPassword(userData.password);
 
     try {
@@ -42,7 +45,7 @@ export class UserService {
   /**
    * get user by id
    */
-  getUserById(id: number): Promise<User> {
+  getUserById(id: string): Promise<User> {
     return this.userRepository.findOne(id);
   }
 
@@ -89,7 +92,7 @@ export class UserService {
   /**
    * Update user
    */
-  async updateUser(id: number, data: Partial<any>) {
+  async updateUser(id: string, data: Partial<any>) {
     const user = await this.getUserById(id);
 
     if (data.password || data.roles) {
@@ -111,7 +114,7 @@ export class UserService {
    * Update Password
    */
   async updatePassword(
-    id: number,
+    id: string,
     data: {
       email: string;
       prvPassword: string;

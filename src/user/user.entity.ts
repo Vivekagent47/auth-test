@@ -10,6 +10,8 @@ import { Exclude } from 'class-transformer';
 
 export type UserRole = 'admin' | 'user';
 
+export type UserType = 'student' | 'recuiter';
+
 /**
  * User entity
  */
@@ -18,8 +20,8 @@ export class User {
   /**
    * Primary key id
    */
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   /**
    * first name
@@ -58,6 +60,24 @@ export class User {
    */
   @Column('simple-array')
   roles: UserRole[];
+
+  /**
+   * user type: student or recuiter
+   */
+  @Column()
+  userType: UserType;
+
+  /**
+   * country code
+   */
+  @Column()
+  countryCode: string;
+
+  /**
+   * mobile number
+   */
+  @Column()
+  mobileNumber: number;
 
   /**
    * created at

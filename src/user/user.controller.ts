@@ -31,7 +31,7 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles('user', 'admin')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getMe(@Param() userID: number): Promise<User> {
+  async getMe(@Param() userID: string): Promise<User> {
     try {
       return await this.service.getUserById(userID);
     } catch (error) {
@@ -61,7 +61,7 @@ export class UserController {
   @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
   async updateUser(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() data: Partial<User>,
   ): Promise<User> {
     try {
@@ -77,7 +77,7 @@ export class UserController {
   @Roles('user')
   @UseInterceptors(ClassSerializerInterceptor)
   async updatePassword(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() data: { email: string; prvPassword: string; newPassword: string },
   ): Promise<any> {
     try {
