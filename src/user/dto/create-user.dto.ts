@@ -49,6 +49,7 @@ export class CreateUserDto {
   @ApiProperty()
   readonly countryCode: string;
 
+  @IsNotEmpty()
   @ApiProperty()
   readonly userType: UserType;
 }
