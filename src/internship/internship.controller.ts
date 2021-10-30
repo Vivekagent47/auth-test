@@ -65,13 +65,6 @@ export class InternshipController {
     @Body() data: CreateInternshipDto,
   ): Promise<Internship> {
     try {
-      // if (user.userType === 'student') {
-      //   throw new HttpException(
-      //     'You are not authorized to create an internship',
-      //     HttpStatus.UNAUTHORIZED,
-      //   );
-      // }
-
       return await this.service.createInternship(token, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

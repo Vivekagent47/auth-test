@@ -78,9 +78,16 @@ export class InternshipService {
           'You are not authorized to create an internship',
           HttpStatus.UNAUTHORIZED,
         );
-      } else {
+      }
+
+      if (user.userType === 'recruiter') {
         return await this.internshipRepo.save(internship);
       }
+
+      throw new HttpException(
+        'You are not authorized to create an internship',
+        HttpStatus.UNAUTHORIZED,
+      );
     } catch (error) {
       throw error;
     }
