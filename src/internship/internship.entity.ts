@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   CreateDateColumn,
+  UpdateDateColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
@@ -25,9 +26,16 @@ export class Internship {
   createdAt: Date;
 
   /**
+   * updated at
+   */
+  @Exclude()
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  /**
    * activation status
    */
-  @Column({ name: 'is_active' })
+  @Column()
   isActive: boolean;
 
   /**

@@ -1,7 +1,10 @@
 import {
   Get,
+  Post,
+  Body,
   Param,
   Query,
+  Headers,
   UseGuards,
   Controller,
   HttpException,
@@ -16,6 +19,7 @@ import { RolesGuard, Roles } from '../utils';
 import { InternshipService } from './internship.service';
 import { PaginationDto } from './dto/pagination.dto';
 import { PaginatedResultDto } from './dto/paginatedResult.dto';
+import { CreateInternshipDto } from './dto/create-internship.dto';
 
 /**
  * Internship Controller
@@ -46,6 +50,29 @@ export class InternshipController {
   async getOneInternship(@Param('id') id: string): Promise<Internship> {
     try {
       return await this.service.getInternshipById(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post()
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async createInternship(
+    @Headers('authorization') token: string,
+    @Body() data: CreateInternshipDto,
+  ): Promise<Internship> {
+    try {
+      // if (user.userType === 'student') {
+      //   throw new HttpException(
+      //     'You are not authorized to create an internship',
+      //     HttpStatus.UNAUTHORIZED,
+      //   );
+      // }
+
+      return await this.service.createInternship(token, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

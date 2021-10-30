@@ -26,6 +26,7 @@ export class CreateInternshipDto {
   @ApiProperty()
   readonly jobDescription: string;
 
+  @IsNotEmpty()
   @ApiProperty()
   readonly skills: string[];
 
