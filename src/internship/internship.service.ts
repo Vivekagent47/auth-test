@@ -73,14 +73,7 @@ export class InternshipService {
         throw new Error('Inactive user');
       }
 
-      if (user.userType === 'student') {
-        throw new HttpException(
-          'You are not authorized to create an internship',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      if (user.userType === 'recruiter') {
+      if (user.userType === 'recruiter' || user.roles.includes('admin')) {
         return await this.internshipRepo.save(internship);
       }
 
@@ -104,8 +97,8 @@ export class InternshipService {
     const totalCount = await this.internshipRepo.count();
     const products = await this.internshipRepo
       .createQueryBuilder()
-      .orderBy('createdAt', 'DESC')
       .offset(skippedItems)
+      .andHaving('isActive = :isActive', { isActive: true })
       .limit(paginationDto.limit)
       .getMany();
 
@@ -120,7 +113,48 @@ export class InternshipService {
   /**
    * gel internship by ID
    */
-  getInternshipById(id: string): Promise<Internship> {
-    return this.internshipRepo.findOne(id);
+  async getInternshipById(id: string): Promise<Internship> {
+    return await this.internshipRepo.findOne(id);
+  }
+
+  /**
+   * Update the internship
+   */
+  async updateInternship(token: string, id: string, data: Partial<Internship>) {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token.split(' ')[1]);
+    } catch (err) {
+      throw new Error('Invalid token');
+    }
+
+    if (data.isActive === false || data.isActive === true) {
+      throw new Error('Actice state is not changed from this route');
+    }
+
+    const internship = await this.internshipRepo.findOne(id);
+    const user = await this.userService.getUserById(payload.userId);
+
+    try {
+      if (!user.isActive) {
+        throw new Error('Inactive user');
+      }
+
+      if (user.userType === 'recruiter' || user.roles.includes('admin')) {
+        if (id === internship.id) {
+          await this.internshipRepo.update(id, data);
+          return { success: true, message: 'Internship updated successfully' };
+        } else {
+          throw new Error('Invalid Credientials');
+        }
+      }
+
+      throw new HttpException(
+        'You are not authorized to create an internship',
+        HttpStatus.UNAUTHORIZED,
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 }

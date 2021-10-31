@@ -6,7 +6,6 @@ export class PaginationDto {
   @ApiProperty()
   page: number;
 
-  @IsNotEmpty()
   @ApiProperty()
   limit: number;
 }

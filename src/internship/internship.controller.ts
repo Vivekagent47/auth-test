@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Put,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -34,7 +35,7 @@ export class InternshipController {
     @Query() data: PaginationDto,
   ): Promise<PaginatedResultDto> {
     data.page = Number(data.page);
-    data.limit = Number(data.limit);
+    data.limit = Number(data.limit ? data.limit : 18);
 
     return await this.service.getInternships({
       ...data,
@@ -66,6 +67,23 @@ export class InternshipController {
   ): Promise<Internship> {
     try {
       return await this.service.createInternship(token, data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put('/update/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async updateInternship(
+    @Headers('authorization') token: string,
+    @Param('id') id: string,
+    @Body() data: Partial<Internship>,
+  ) {
+    try {
+      return await this.service.updateInternship(token, id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
