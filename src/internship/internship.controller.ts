@@ -94,7 +94,7 @@ export class InternshipController {
     @Headers('authorization') token: string,
     @Param('id') id: string,
     @Body() data: Partial<Internship>,
-  ) {
+  ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.service.updateInternship(token, id, data);
     } catch (error) {
@@ -107,7 +107,9 @@ export class InternshipController {
   @UseGuards(RolesGuard)
   @Roles('admin')
   @UseInterceptors(ClassSerializerInterceptor)
-  async activateInternship(@Param('id') id: string) {
+  async activateInternship(
+    @Param('id') id: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.service.activateInternship(id);
     } catch (error) {
