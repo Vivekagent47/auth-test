@@ -46,9 +46,6 @@ export class InternshipService {
     internship.jobDescription = data.jobDescription ? data.jobDescription : '';
     internship.skills = data.skills;
     internship.noOfOpening = data.noOfOpening;
-    internship.minStipen = data.minStipen ? data.minStipen : 0;
-    internship.maxStipen = data.maxStipen ? data.maxStipen : 0;
-    internship.currencyType = data.currencyType ? data.currencyType : '';
     internship.internshipType = data.internshipType;
     internship.internshipPeriod = data.internshipPeriod;
     internship.applyBy = data.applyBy;
@@ -57,6 +54,22 @@ export class InternshipService {
       ? data.responsibilities
       : [];
     internship.perks = data.perks ? data.perks : [];
+
+    if (data.internshipType === 'onsite') {
+      internship.location = data.location;
+    } else {
+      internship.location = '';
+    }
+
+    if (data.compensation === true) {
+      internship.minStipen = data.minStipen;
+      internship.maxStipen = data.maxStipen;
+      internship.currencyType = data.currencyType;
+    } else {
+      internship.minStipen = 0;
+      internship.maxStipen = 0;
+      internship.currencyType = '';
+    }
 
     let payload: any;
 
