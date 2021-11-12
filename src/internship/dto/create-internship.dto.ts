@@ -67,13 +67,23 @@ export class CreateInternshipDto {
   @ApiProperty()
   readonly applyBy: Date;
 
+  @IsNotEmpty()
   @ApiProperty()
   readonly responsibilities: string[];
 
+  @IsNotEmpty()
   @ApiProperty()
   readonly perks: string[];
 
   @IsNotEmpty()
   @ApiProperty()
   readonly category: Category;
+
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly interview: boolean;
+
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly prePlacementOffer: boolean;
 }

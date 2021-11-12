@@ -18,9 +18,22 @@ export type Category =
   | 'humanities'
   | 'other';
 
-export type Applied = {
-  studentID: string;
-  answers: string[];
+// export type Applied = {
+//   studentID: string;
+//   answers: Answer[];
+// };
+
+// export type Answer = {
+//   questionID: string;
+//   answer: string;
+// };
+
+export type AnsType = 'number' | 'string';
+
+export type Question = {
+  id: string;
+  question: string;
+  ansType: AnsType;
 };
 
 export type InternshipType = 'workfromhome' | 'onsite';
@@ -39,8 +52,7 @@ export class Internship {
   /**
    * created at
    */
-  @Exclude()
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
   /**
@@ -166,8 +178,11 @@ export class Internship {
   category: Category;
 
   @Column('simple-array')
-  questions: string[];
+  questions: Question[];
 
-  @Column('simple-array')
-  applied: Applied[];
+  @Column()
+  interview: boolean;
+
+  @Column()
+  prePlacementOffer: boolean;
 }
