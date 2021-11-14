@@ -93,7 +93,7 @@ export class InternshipController {
   async updateInternship(
     @Headers('authorization') token: string,
     @Param('id') id: string,
-    @Body() data: Partial<Internship>,
+    @Body() data: CreateInternshipDto,
   ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.service.updateInternship(token, id, data);
