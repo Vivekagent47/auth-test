@@ -18,16 +18,6 @@ export type Category =
   | 'humanities'
   | 'other';
 
-// export type Applied = {
-//   studentID: string;
-//   answers: Answer[];
-// };
-
-// export type Answer = {
-//   questionID: string;
-//   answer: string;
-// };
-
 export type AnsType = 'number' | 'string';
 
 export type Question = {
@@ -192,6 +182,9 @@ export class Internship {
 
   @Column('longtext')
   questions: string;
+
+  @Column('simple-array')
+  applicant: string[];
 
   @Column()
   interview: boolean;
