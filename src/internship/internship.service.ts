@@ -79,6 +79,7 @@ export class InternshipService {
     internship.interview = data.interview;
     internship.prePlacementOffer = data.prePlacementOffer;
     internship.category = data.category;
+    internship.applicant = [];
     internship.numberOfApplicants = 0;
     internship.questions = this.jsonToString([
       {
