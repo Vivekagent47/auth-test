@@ -329,6 +329,15 @@ export class InternshipService {
         throw new Error('Inactive user');
       }
 
+      for (let i = 0; i < internship.applicant.length; i++) {
+        const applicant = await this.applyInternshipRepo.findOne(
+          internship.applicant[i],
+        );
+        if (applicant.userId === payload.userId) {
+          throw new Error('You have already applied for this internship');
+        }
+      }
+
       if (user.userType === 'student') {
         const newApplication = new ApplyInternship();
         newApplication.userId = payload.userId;
