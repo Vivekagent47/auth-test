@@ -58,9 +58,6 @@ export class InternshipController {
   }
 
   @Get('/activeAll')
-  @ApiBearerAuth()
-  @UseGuards(RolesGuard)
-  @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
   async getInternshipByAllActive(): Promise<Internship[]> {
     try {
