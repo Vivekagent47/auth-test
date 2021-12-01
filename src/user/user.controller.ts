@@ -9,6 +9,7 @@ import {
   HttpException,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Delete,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -100,6 +101,19 @@ export class UserController {
   ) {
     try {
       return await this.service.updateRole(id, data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Delete('/delete/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async deleteUser(@Param('id') id: string): Promise<any> {
+    try {
+      return await this.service.deleteUser(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

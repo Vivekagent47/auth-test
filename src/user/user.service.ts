@@ -3,6 +3,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from './user.entity';
+import { Student } from './student.entity';
+import { Recruiter } from './recruiter.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserRole } from '.';
@@ -15,6 +17,12 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Student)
+    private readonly studentRepository: Repository<Student>,
+
+    @InjectRepository(Recruiter)
+    private readonly recruiterRepository: Repository<Recruiter>,
   ) {}
 
   /**
@@ -31,6 +39,11 @@ export class UserService {
     user.mobileNumber = userData.mobileNumber ? userData.mobileNumber : '';
     user.countryCode = userData.countryCode ? userData.countryCode : '';
     user.password = await this.hashPassword(userData.password);
+    const profile =
+      userData.userType === 'student'
+        ? await this.createStudentProfile()
+        : await this.createRecruiterProfile();
+    user.profile = profile.id;
 
     try {
       return this.userRepository.save(user);
@@ -39,8 +52,31 @@ export class UserService {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new Error(`user already exists with email ${user.email}`);
       }
-
       throw error;
+    }
+  }
+
+  async createStudentProfile(): Promise<Student> {
+    const profile = new Student();
+    profile.gender = 'male';
+    profile.currentLocation = '';
+
+    try {
+      return this.studentRepository.save(profile);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async createRecruiterProfile(): Promise<Recruiter> {
+    const profile = new Recruiter();
+    profile.gender = 'male';
+    profile.currentLocation = '';
+
+    try {
+      return this.recruiterRepository.save(profile);
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
@@ -174,6 +210,24 @@ export class UserService {
       };
     } catch {
       throw new Error('Some error');
+    }
+  }
+
+  async deleteUser(id: string) {
+    try {
+      const data = await this.userRepository.findOne(id);
+      await this.userRepository.delete(data.id);
+      if (data.userType === 'student') {
+        await this.studentRepository.delete(data.profile);
+      } else {
+        await this.recruiterRepository.delete(data.profile);
+      }
+      return {
+        success: true,
+        message: 'User Deleted Successfully',
+      };
+    } catch (error) {
+      throw new Error(error);
     }
   }
 }
