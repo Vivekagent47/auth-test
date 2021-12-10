@@ -47,11 +47,13 @@ export class InternshipController {
   @Get('/all')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getAllInternships(): Promise<Internship[]> {
+  async getAllInternships(
+    @Headers('authorization') token: string,
+  ): Promise<Internship[]> {
     try {
-      return await this.service.getAllInternships();
+      return await this.service.getAllInternships(token);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

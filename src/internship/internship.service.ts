@@ -43,7 +43,6 @@ export class InternshipService {
     data: CreateInternshipDto,
   ): Promise<Internship> {
     const internship = new Internship();
-    internship.isActive = false;
     internship.jobName = data.jobName;
     internship.companyName = data.companyName;
     internship.companyUrl = data.companyUrl ? data.companyUrl : '';
@@ -122,10 +121,30 @@ export class InternshipService {
       }
 
       if (user.userType === 'recruiter' || user.roles.includes('admin')) {
-        const data = await this.internshipRepo.save(internship);
-        data.questions = JSON.parse(data.questions);
-        delete data.applicant;
-        return data;
+        if (user.roles.includes('admin')) {
+          internship.isActive = true;
+        } else if (user.userType === 'recruiter') {
+          internship.isActive = false;
+        }
+
+        const temp = await this.internshipRepo.save(internship);
+        temp.questions = JSON.parse(temp.questions);
+        delete temp.applicant;
+
+        if (user.roles.includes('admin')) {
+          try {
+            await this.userService.createInternship(data.recuiterId, temp.id);
+          } catch (err) {
+            throw new Error(err);
+          }
+        } else if (user.userType === 'recruiter') {
+          try {
+            await this.userService.createInternship(user.id, temp.id);
+          } catch (err) {
+            throw new Error(err);
+          }
+        }
+        return temp;
       }
 
       throw new HttpException(
@@ -215,15 +234,41 @@ export class InternshipService {
   /**
    * get All the internship
    */
-  async getAllInternships(): Promise<Internship[]> {
-    const data = await this.internshipRepo.find();
-    for (let i = 0; i < data.length; i++) {
-      data[i].questions = JSON.parse(data[i].questions);
-      data[i].numberOfApplicants = data[i].applicant.length;
-      delete data[i].applicant;
+  async getAllInternships(token: string): Promise<Internship[]> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token.split(' ')[1]);
+    } catch (err) {
+      throw new Error('Invalid token');
     }
 
-    return data;
+    const user = await this.userService.getUserById(payload.userId);
+
+    if (!user) {
+      throw new Error('Invalid token');
+    }
+
+    if (!user.isActive) {
+      throw new Error('User is not active');
+    }
+
+    if (user.userType === 'recruiter' || user.roles.includes('admin')) {
+      const data = await this.internshipRepo
+        .createQueryBuilder()
+        .orderBy('createdAt', 'DESC')
+        .getMany();
+
+      for (let i = 0; i < data.length; i++) {
+        data[i].questions = JSON.parse(data[i].questions);
+        data[i].numberOfApplicants = data[i].applicant.length;
+      }
+      return data;
+    } else {
+      throw new HttpException(
+        'You are not authorized to view all internship',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   /**
