@@ -33,6 +33,18 @@ export class Recruiter {
   currentLocation: string;
 
   /**
+   * Kyc details
+   */
+  @Column()
+  kyc: string;
+
+  /**
+   * posted internships
+   */
+  @Column('simple-array')
+  postedInternship: string[];
+
+  /**
    * created at
    */
   @Exclude()
