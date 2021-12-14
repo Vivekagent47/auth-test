@@ -371,6 +371,39 @@ export class InternshipService {
   }
 
   /**
+   * Deactive Internship
+   */
+  async deactivateInternship(
+    id: string,
+    token: string,
+  ): Promise<{ success: boolean; message: string }> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token.split(' ')[1]);
+    } catch (err) {
+      throw new Error('Invalid token');
+    }
+
+    const user = await this.userService.getUserById(payload.userId);
+
+    if (!user.isActive) {
+      throw new Error('Inactive user');
+    }
+
+    if (user.userType === 'recruiter' || user.roles.includes('admin')) {
+      const internship = await this.internshipRepo.findOne(id);
+      internship.isActive = false;
+      await this.internshipRepo.save(internship);
+      return { success: true, message: 'Internship deactivated successfully' };
+    } else {
+      throw new HttpException(
+        'You are not authorized to deactivate an internship',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
+
+  /**
    * Apply Internship
    */
   async applyInternship(

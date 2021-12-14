@@ -127,6 +127,22 @@ export class InternshipController {
     }
   }
 
+  @Put('/deactive/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async deactiveInternship(
+    @Headers('authorization') token: string,
+    @Param('id') id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      return await this.service.deactivateInternship(id, token);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Put('/apply/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
