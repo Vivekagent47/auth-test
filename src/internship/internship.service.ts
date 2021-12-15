@@ -174,6 +174,7 @@ export class InternshipService {
    */
   async getInternships(
     paginationDto: PaginationDto,
+    token: string,
   ): Promise<PaginatedResultDto> {
     const skippedItems = (paginationDto.page - 1) * paginationDto.limit;
 
@@ -187,6 +188,16 @@ export class InternshipService {
         : totalPages;
     const prevPage = paginationDto.page - 1 >= 1 ? paginationDto.page - 1 : 1;
 
+    let payload: any, user: any;
+    if (token) {
+      try {
+        payload = await this.jwtService.verify(token.split(' ')[1]);
+        user = await this.userService.getUserById(payload.userId);
+      } catch (err) {
+        throw new Error('Invalid token');
+      }
+    }
+
     const data = await this.internshipRepo
       .createQueryBuilder()
       .orderBy('createdAt', 'DESC')
@@ -198,7 +209,11 @@ export class InternshipService {
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
       data[i].numberOfApplicants = data[i].applicant.length;
-      delete data[i].applicant;
+      if (!token) {
+        delete data[i].applicant;
+      } else if (user.userType === 'student') {
+        delete data[i].applicant;
+      }
     }
 
     return {
@@ -215,7 +230,17 @@ export class InternshipService {
   /**
    * get all active internship
    */
-  async getInternshipByAllActive(): Promise<Internship[]> {
+  async getInternshipByAllActive(token: string): Promise<Internship[]> {
+    let payload: any, user: any;
+    if (token) {
+      try {
+        payload = await this.jwtService.verify(token.split(' ')[1]);
+        user = await this.userService.getUserById(payload.userId);
+      } catch (err) {
+        throw new Error('Invalid token');
+      }
+    }
+
     const data = await this.internshipRepo
       .createQueryBuilder()
       .orderBy('createdAt', 'DESC')
@@ -225,7 +250,11 @@ export class InternshipService {
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
       data[i].numberOfApplicants = data[i].applicant.length;
-      delete data[i].applicant;
+      if (!token) {
+        delete data[i].applicant;
+      } else if (user.userType === 'student') {
+        delete data[i].applicant;
+      }
     }
 
     return data;
@@ -274,11 +303,25 @@ export class InternshipService {
   /**
    * gel internship by ID
    */
-  async getInternshipById(id: string): Promise<Internship> {
+  async getInternshipById(token: string, id: string): Promise<Internship> {
+    let payload: any, user: any;
+    if (token) {
+      try {
+        payload = await this.jwtService.verify(token.split(' ')[1]);
+        user = await this.userService.getUserById(payload.userId);
+      } catch (err) {
+        throw new Error('Invalid token');
+      }
+    }
+
     const data = await this.internshipRepo.findOne(id);
     data.questions = JSON.parse(data.questions);
     data.numberOfApplicants = data.applicant.length;
-    delete data.applicant;
+    if (!token) {
+      delete data.applicant;
+    } else if (user.userType === 'student') {
+      delete data.applicant;
+    }
     return data;
   }
 

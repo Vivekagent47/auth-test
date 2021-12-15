@@ -33,15 +33,19 @@ export class InternshipController {
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
   async getPanginatedInternship(
+    @Headers('authorization') token: string,
     @Query() data: PaginationDto,
   ): Promise<PaginatedResultDto> {
     data.page = Number(data.page);
     data.limit = Number(data.limit ? data.limit : 18);
 
-    return await this.service.getInternships({
-      ...data,
-      limit: data.limit > 18 ? 18 : data.limit,
-    });
+    return await this.service.getInternships(
+      {
+        ...data,
+        limit: data.limit > 18 ? 18 : data.limit,
+      },
+      token,
+    );
   }
 
   @Get('/all')
@@ -61,9 +65,11 @@ export class InternshipController {
 
   @Get('/activeAll')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getInternshipByAllActive(): Promise<Internship[]> {
+  async getInternshipByAllActive(
+    @Headers('authorization') token: string,
+  ): Promise<Internship[]> {
     try {
-      return await this.service.getInternshipByAllActive();
+      return await this.service.getInternshipByAllActive(token);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -71,9 +77,12 @@ export class InternshipController {
 
   @Get('/:id')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getOneInternship(@Param('id') id: string): Promise<Internship> {
+  async getOneInternship(
+    @Headers('authorization') token: string,
+    @Param('id') id: string,
+  ): Promise<Internship> {
     try {
-      return await this.service.getInternshipById(id);
+      return await this.service.getInternshipById(token, id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
