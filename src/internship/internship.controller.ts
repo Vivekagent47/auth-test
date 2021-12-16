@@ -136,7 +136,7 @@ export class InternshipController {
     }
   }
 
-  @Put('/deactive/:id')
+  @Put('/deactivate/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('admin', 'user')

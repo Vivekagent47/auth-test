@@ -407,9 +407,7 @@ export class InternshipService {
   async activateInternship(
     id: string,
   ): Promise<{ success: boolean; message: string }> {
-    const internship = await this.internshipRepo.findOne(id);
-    internship.isActive = true;
-    await this.internshipRepo.save(internship);
+    await this.internshipRepo.update(id, { isActive: true });
     return { success: true, message: 'Internship activated successfully' };
   }
 
@@ -434,9 +432,7 @@ export class InternshipService {
     }
 
     if (user.userType === 'recruiter' || user.roles.includes('admin')) {
-      const internship = await this.internshipRepo.findOne(id);
-      internship.isActive = false;
-      await this.internshipRepo.save(internship);
+      await this.internshipRepo.update(id, { isActive: false });
       return { success: true, message: 'Internship deactivated successfully' };
     } else {
       throw new HttpException(
