@@ -229,8 +229,8 @@ export class UserService {
         success: true,
         message: 'Role Changed Successfully',
       };
-    } catch {
-      throw new Error('Some error');
+    } catch (err) {
+      throw new Error(err);
     }
   }
 
