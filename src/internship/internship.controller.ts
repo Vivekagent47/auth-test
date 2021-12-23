@@ -152,7 +152,7 @@ export class InternshipController {
     }
   }
 
-  @Put('/apply/:id')
+  @Post('/apply/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('user')
