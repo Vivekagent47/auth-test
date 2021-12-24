@@ -11,6 +11,8 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserRole } from '.';
 import { KYC } from './kyc.entity';
 import { KycDto } from './dto/kyc.dto';
+import { Education } from './education.entity';
+import { Experience } from './experience.entity';
 
 /**
  * User service
@@ -29,6 +31,12 @@ export class UserService {
 
     @InjectRepository(KYC)
     private readonly kycRepository: Repository<KYC>,
+
+    @InjectRepository(Education)
+    private readonly educationRepository: Repository<Education>,
+
+    @InjectRepository(Experience)
+    private readonly experienceRepository: Repository<Experience>,
 
     private readonly jwtService: JwtService,
   ) {}
@@ -60,6 +68,16 @@ export class UserService {
     const profile = new Student();
     profile.gender = 'male';
     profile.currentLocation = '';
+    profile.title = '';
+    profile.discription = '';
+    profile.socials = '';
+    profile.protfolios = '';
+    profile.discription = '';
+    profile.advancedSkills = [];
+    profile.begnierSkills = [];
+    profile.intermediateSkills = [];
+    profile.experience = [];
+    profile.education = [];
 
     try {
       const temp = await this.studentRepository.save(profile);
@@ -239,6 +257,13 @@ export class UserService {
       const data = await this.getUserById(id);
       if (data.userType === 'student') {
         await this.studentRepository.delete(data.profile.id);
+        for (let i = 0; i < data.profile.education.length; i++) {
+          await this.educationRepository.delete(data.profile.education[i]);
+        }
+
+        for (let i = 0; i < data.profile.experience.length; i++) {
+          await this.experienceRepository.delete(data.profile.experience[i]);
+        }
       } else {
         if (data.profile.kyc !== '') {
           await this.kycRepository.delete(data.profile.kyc);
@@ -302,6 +327,29 @@ export class UserService {
     }
   }
 
+  async applieInternship(
+    userId: string,
+    internshipId: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const { profile } = await this.getUserById(userId);
+      const student = await this.studentRepository.findOne(profile.id);
+      if (!student) {
+        throw new Error('Student not found');
+      }
+
+      student.appliedJobs.push(internshipId);
+      await this.studentRepository.update(student.id, student);
+
+      return {
+        success: true,
+        message: 'Internship applied successfully',
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
   async createInternship(
     userId: string,
     internshipID: string,
@@ -336,6 +384,17 @@ export class UserService {
     }
     jsonArr_string += ']';
     return jsonArr_string;
+  }
+
+  async getKycDeatils(id: string) {
+    const { profile } = await this.getUserById(id);
+    try {
+      const kyc = await this.kycRepository.findOne(profile.kyc);
+      kyc.socials = JSON.parse(kyc.socials);
+      return kyc;
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   async verifyKyc(id: string): Promise<{ success: boolean; message: string }> {

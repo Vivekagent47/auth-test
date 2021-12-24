@@ -127,6 +127,19 @@ export class UserController {
 export class RecruiterController {
   constructor(private readonly service: UserService) {}
 
+  @Get('/kyc/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getKycDeatils(@Param('id') id: string) {
+    try {
+      return await this.service.getKycDeatils(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Post('/applykyc')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
@@ -155,4 +168,9 @@ export class RecruiterController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+}
+
+@Controller('student')
+export class StudentController {
+  constructor(private readonly service: UserService) {}
 }

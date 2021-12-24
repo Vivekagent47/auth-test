@@ -59,6 +59,9 @@ export class Student {
   @Column('simple-array')
   experience: string[];
 
+  @Column('simple-array')
+  appliedJobs: string[];
+
   /**
    * created at
    */

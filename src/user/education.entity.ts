@@ -7,6 +7,8 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
+export type Status = 'pursuing' | 'completed';
+
 @Entity()
 export class Education {
   @PrimaryGeneratedColumn('uuid')
@@ -36,5 +38,5 @@ export class Education {
   endDate: Date;
 
   @Column()
-  status: string;
+  status: Status;
 }
