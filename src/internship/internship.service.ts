@@ -484,6 +484,8 @@ export class InternshipService {
         internship.applicant.push(applyData.id);
         await this.internshipRepo.save(internship);
 
+        await this.userService.applieInternship(payload.userID, internship.id);
+
         return {
           success: true,
           message: 'Application submitted successfully',
