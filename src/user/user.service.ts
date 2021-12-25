@@ -423,4 +423,27 @@ export class UserService {
       throw new Error(error);
     }
   }
+
+  async getStudentProfile(id: string) {
+    const { profile } = await this.getUserById(id);
+    try {
+      let temp = [];
+      for (let i = 0; i < profile.education.length; i++) {
+        temp.push(await this.educationRepository.findOne(profile.education[i]));
+      }
+      profile.education = temp;
+
+      temp = [];
+      for (let i = 0; i < profile.experience.length; i++) {
+        temp.push(
+          await this.experienceRepository.findOne(profile.experience[i]),
+        );
+      }
+      profile.experience = temp;
+
+      return profile;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }

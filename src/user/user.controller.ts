@@ -173,4 +173,17 @@ export class RecruiterController {
 @Controller('student')
 export class StudentController {
   constructor(private readonly service: UserService) {}
+
+  @Get('/profile/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('user', 'admin')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getStudentProfile(@Param('id') id: string) {
+    try {
+      return await this.service.getStudentProfile(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }
