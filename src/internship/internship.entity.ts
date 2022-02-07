@@ -194,4 +194,10 @@ export class Internship {
 
   @Column()
   prePlacementOffer: boolean;
+
+  @Column()
+  views: number;
+
+  @Column()
+  applyRate: number;
 }
