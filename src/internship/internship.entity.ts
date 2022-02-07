@@ -194,4 +194,6 @@ export class Internship {
 
   @Column()
   prePlacementOffer: boolean;
+
+  // View paramter
 }

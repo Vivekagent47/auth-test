@@ -75,6 +75,7 @@ export class UserService {
     profile.discription = '';
     profile.advancedSkills = [];
     profile.begnierSkills = [];
+    profile.appliedJobs = [];
     profile.intermediateSkills = [];
     profile.experience = [];
     profile.education = [];

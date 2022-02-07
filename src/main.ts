@@ -13,6 +13,8 @@ async function bootstrap() {
     .addBearerAuth()
     .addTag('jwt')
     .build();
+  
+  app.setGlobalPrefix('api/v1');
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);

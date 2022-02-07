@@ -33,7 +33,7 @@ export class AuthController {
   async register(@Body() userDto: CreateUserDto): Promise<User> {
     try {
       const temp = await this.service.registerUser(userDto);
-      await this.service.refisterProfile(temp);
+      await this.service.registerProfile(temp);
       return temp;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

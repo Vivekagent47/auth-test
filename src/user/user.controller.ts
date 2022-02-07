@@ -17,7 +17,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { User } from './user.entity';
 import { UserService } from './user.service';
-import { RolesGuard, Roles } from '../utils';
+import { RolesGuard, Roles, AuthUser } from '../utils';
 // import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserRole } from '.';
 import { KycDto } from './dto/kyc.dto';
@@ -28,6 +28,14 @@ import { KycDto } from './dto/kyc.dto';
 @Controller('user')
 export class UserController {
   constructor(private readonly service: UserService) {}
+
+  // trial current user
+  // getting the current user from the request
+  @Get('current')
+  async currentUser(@AuthUser() user: User): Promise<User> {
+    // console.log(user);
+    return user;
+  }
 
   /**
    * logged in user's profile

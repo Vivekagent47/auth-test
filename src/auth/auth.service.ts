@@ -25,7 +25,7 @@ export class AuthService {
     return this.userService.createUser(userData);
   }
 
-  async refisterProfile(user: User) {
+  async registerProfile(user: User) {
     if (user.userType === 'student') {
       await this.userService.initialStudentProfile(user.id);
     }

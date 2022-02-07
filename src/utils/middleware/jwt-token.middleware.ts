@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
 
@@ -17,11 +17,15 @@ export class JwtTokenMiddleware implements NestMiddleware {
     req.locals.user = null;
 
     const token: string = this.getBearerToken(req);
+    
     if (token) {
       const isTokenValid: boolean = this.verifyToken(token);
 
       if (isTokenValid) {
         const payload: any = this.getTokenPayload(token);
+        
+        console.log('payload', payload);
+
         req.locals.user = {
           id: payload.userId,
           email: payload.email,
@@ -29,7 +33,6 @@ export class JwtTokenMiddleware implements NestMiddleware {
         };
       }
     }
-
     next();
   }
 
