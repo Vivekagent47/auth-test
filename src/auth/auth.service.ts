@@ -5,6 +5,7 @@ import { TokenDto } from './dto/token.dto';
 import { User, CreateUserDto, UserService } from '../user';
 import { LoginCredential } from './dto/login-credential.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { AdminDto } from './dto/create-admin.dto';
 
 /**
  * Auth service
@@ -23,6 +24,10 @@ export class AuthService {
    */
   async registerUser(userData: CreateUserDto): Promise<User> {
     return this.userService.createUser(userData);
+  }
+
+  async registerAdmin(userData: AdminDto): Promise<User> {
+    return this.userService.createAdmin(userData);
   }
 
   async registerProfile(user: User) {
@@ -59,6 +64,32 @@ export class AuthService {
     delete user.password;
 
     const authToken: TokenDto = this.generateAuthToken(user);
+    return Promise.resolve({ authToken, user });
+  }
+
+  /**
+   * admin login
+   */ 
+  async loginAdmin(data : AdminDto): Promise<any> {
+    const user = await this.userService.getUserByEmail(data.email);
+
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    const isMatched = await this.userService.checkPassword(
+      user,
+      data.password,
+    );
+
+    if (!isMatched) {
+      throw new Error('Invalid Admin credentials');
+    }
+
+    delete user.password;
+
+    const authToken: TokenDto = this.generateAuthToken(user);
+
     return Promise.resolve({ authToken, user });
   }
 

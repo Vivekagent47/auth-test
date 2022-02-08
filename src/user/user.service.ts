@@ -9,10 +9,12 @@ import { Recruiter } from './recruiter.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserRole } from '.';
-import { KYC } from './kyc.entity';
+import { Company } from './company.entity';
 import { KycDto } from './dto/kyc.dto';
 import { Education } from './education.entity';
 import { Experience } from './experience.entity';
+import { AdminDto } from 'src/auth/dto/create-admin.dto';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * User service
@@ -20,6 +22,8 @@ import { Experience } from './experience.entity';
 @Injectable()
 export class UserService {
   constructor(
+    private configService: ConfigService,
+
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
@@ -29,8 +33,8 @@ export class UserService {
     @InjectRepository(Recruiter)
     private readonly recruiterRepository: Repository<Recruiter>,
 
-    @InjectRepository(KYC)
-    private readonly kycRepository: Repository<KYC>,
+    @InjectRepository(Company)
+    private readonly companyRepository: Repository<Company>,
 
     @InjectRepository(Education)
     private readonly educationRepository: Repository<Education>,
@@ -56,6 +60,29 @@ export class UserService {
     user.countryCode = userData.countryCode ? userData.countryCode : '';
     user.password = await this.hashPassword(userData.password);
     user.profile = '';
+
+    try {
+      return this.userRepository.save(user);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * create a admin
+   */
+  async createAdmin(userData: AdminDto): Promise<User> {
+    const user = new User();
+    user.firstName = 'admin';
+    user.lastName = 'admin';
+    user.email = userData.email;
+    user.roles = ['admin'];
+    user.password = await this.hashPassword(userData.password);
+
+    // check the admintoken from the config
+    if (userData.adminToken !== this.configService.get<string>('ADMIN_TOKEN')) {
+      throw new Error('Invalid admin token');
+    }
 
     try {
       return this.userRepository.save(user);
@@ -106,7 +133,7 @@ export class UserService {
   }
 
   /**
-   * get user by id
+   * get user and the profile by id
    */
   async getUserById(id: string): Promise<any> {
     const user = await this.userRepository.findOne(id);
@@ -267,7 +294,7 @@ export class UserService {
         }
       } else {
         if (data.profile.kyc !== '') {
-          await this.kycRepository.delete(data.profile.kyc);
+          await this.companyRepository.delete(data.profile.kyc);
         }
         await this.recruiterRepository.delete(data.profile.id);
       }
@@ -299,18 +326,18 @@ export class UserService {
     }
 
     if (profile.kyc === '' && userType === 'recruiter') {
-      const kycData = new KYC();
-      kycData.kycStatus = false;
-      kycData.companyName = data.companyName;
-      kycData.establishmentDate = data.establishmentDate;
-      kycData.companySize = data.companySize;
-      kycData.headOffice = data.headOffice;
-      kycData.branchOffice = data.branchOffice;
-      kycData.aboutCompany = data.aboutCompany;
-      kycData.socials = this.jsonToString(data.socials);
+      const companyData = new Company();
+      companyData.kycStatus = false;
+      companyData.companyName = data.companyName;
+      companyData.establishmentDate = data.establishmentDate;
+      companyData.companySize = data.companySize;
+      companyData.headOffice = data.headOffice;
+      companyData.branchOffice = data.branchOffice;
+      companyData.aboutCompany = data.aboutCompany;
+      companyData.socials = this.jsonToString(data.socials);
 
       try {
-        const res = await this.kycRepository.save(kycData);
+        const res = await this.companyRepository.save(companyData);
         console.log(res);
         await this.recruiterRepository.update(profile.id, {
           kyc: res.id,
@@ -390,7 +417,7 @@ export class UserService {
   async getKycDeatils(id: string) {
     const { profile } = await this.getUserById(id);
     try {
-      const kyc = await this.kycRepository.findOne(profile.kyc);
+      const kyc = await this.companyRepository.findOne(profile.kyc);
       kyc.socials = JSON.parse(kyc.socials);
       return kyc;
     } catch (err) {
@@ -404,18 +431,18 @@ export class UserService {
       throw new Error('Invalid credentials');
     }
 
-    if (user.userType !== 'recruiter') {
-      throw new Error('Invalid credentials');
-    }
+    // if (user.userType !== 'recruiter') {
+    //   throw new Error('Invalid credentials');
+    // }
 
-    const kyc = await this.kycRepository.findOne(user.profile.kyc);
+    const company = await this.companyRepository.findOne(user.profile.kyc);
 
-    if (!kyc) {
+    if (!company) {
       throw new Error('KYC is not applied');
     }
 
     try {
-      await this.kycRepository.update(kyc.id, { kycStatus: true });
+      await this.companyRepository.update(company.id, { kycStatus: true });
       return {
         success: true,
         message: 'KYC Verified Successfully',
@@ -443,6 +470,22 @@ export class UserService {
       profile.experience = temp;
 
       return profile;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  /**
+   * get all the companies with verified kyc status
+   */ 
+  async getAllCompanies(): Promise<Company[]> {
+    try {
+      const companies = await this.companyRepository
+        .createQueryBuilder('company')
+        .where('company.kycStatus = :kycStatus', { kycStatus: true })
+        .getMany();
+
+      return companies;
     } catch (err) {
       throw new Error(err);
     }

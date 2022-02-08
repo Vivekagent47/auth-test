@@ -1,5 +1,5 @@
 import { Repository, EntityRepository } from 'typeorm';
-import { KYC } from './kyc.entity';
+import { Company } from './company.entity';
 import { Recruiter } from './recruiter.entity';
 import { Student } from './student.entity';
 import { User } from './user.entity';
@@ -27,8 +27,8 @@ export class RecruiterRepository extends Repository<Recruiter> {}
 /**
  * KYC repository class
  */
-@EntityRepository(KYC)
-export class KYCRepository extends Repository<KYC> {}
+@EntityRepository(Company)
+export class CompanyRepository extends Repository<Company> {}
 
 /**
  * Education repository class

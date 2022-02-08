@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 
-export type Scoial = {
+export type Social = {
   type: string;
   link: string;
 };
@@ -32,7 +32,7 @@ export class KycDto {
   // readonly companyLogo: string;
 
   @IsNotEmpty()
-  @MinLength(50)
+  @MinLength(10)
   @MaxLength(250)
   @ApiProperty()
   readonly aboutCompany: string;
@@ -42,5 +42,5 @@ export class KycDto {
     isArray: true,
     example: [{ type: 'facebook', link: 'https://facebook.com' }],
   })
-  readonly socials: Scoial[];
+  readonly socials: Social[];
 }

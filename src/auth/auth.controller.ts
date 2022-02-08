@@ -13,6 +13,7 @@ import { CreateUserDto, User } from '../user';
 import { LoginCredential } from './dto/login-credential.dto';
 import { TokenDto } from './dto/token.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { AdminDto } from './dto/create-admin.dto';
 // import { Logger } from 'winston';
 
 /**
@@ -49,6 +50,27 @@ export class AuthController {
       return await this.service.login(credential);
     } catch (error) {
       // this.logger.warn('Login attempt failed', credential);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('/adminregister')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async registerAdmin(@Body() adminData : AdminDto) {
+    try {
+      const temp = await this.service.registerAdmin(adminData);
+      return temp;
+    }catch(error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('/adminlogin')
+  async loginAdmin(@Body() adminData : AdminDto) {
+    try{
+      const temp = await this.service.loginAdmin(adminData);
+      return temp;
+    }catch(error){
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }

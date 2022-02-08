@@ -195,5 +195,9 @@ export class Internship {
   @Column()
   prePlacementOffer: boolean;
 
-  // View paramter
+  @Column({ name: 'view_count' })
+  viewCount: number;
+
+  @Column({ name: 'apply_rate' })
+  applyRate: number;
 }

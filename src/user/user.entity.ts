@@ -52,7 +52,7 @@ export class User {
   /**
    * user activation status
    */
-  @Column({ name: 'is_active' })
+  @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
   /**
@@ -64,25 +64,25 @@ export class User {
   /**
    * user type: student or recuiter
    */
-  @Column()
+  @Column({ default: 'recruiter' })
   userType: UserType;
 
   /**
    * country code
    */
-  @Column()
+  @Column({ default: '+91' })
   countryCode: string;
 
   /**
    * mobile number
    */
-  @Column({ length: 10 })
+  @Column({ length: 10, nullable: true })
   mobileNumber: string;
 
   /**
    * user profile
    */
-  @Column()
+  @Column({ default: '' })
   profile: string;
 
   /**

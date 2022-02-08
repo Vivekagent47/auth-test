@@ -18,9 +18,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import * as ormConfig from './orm.config';
 import { JWT_SECRET } from './config';
+import { ConfigModule } from '@nestjs/config';
+
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot(ormConfig),
     JwtModule.register({
       secret: JWT_SECRET,

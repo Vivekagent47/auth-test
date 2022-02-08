@@ -9,7 +9,7 @@ import {
   UserRepository,
   StudentRepository,
   RecruiterRepository,
-  KYCRepository,
+  CompanyRepository,
   EducationRepository,
   ExperienceRepository,
 } from './user.repository';
@@ -18,8 +18,9 @@ import {
   RecruiterController,
   UserController,
   StudentController,
+  AdminController,
 } from './user.controller';
-import { KYC } from './kyc.entity';
+import { Company } from './company.entity';
 import { SharedModule } from '../shared/shared.module';
 
 @Module({
@@ -27,13 +28,13 @@ import { SharedModule } from '../shared/shared.module';
     TypeOrmModule.forFeature([User, UserRepository]),
     TypeOrmModule.forFeature([Student, StudentRepository]),
     TypeOrmModule.forFeature([Recruiter, RecruiterRepository]),
-    TypeOrmModule.forFeature([KYC, KYCRepository]),
+    TypeOrmModule.forFeature([Company, CompanyRepository]),
     TypeOrmModule.forFeature([Education, EducationRepository]),
     TypeOrmModule.forFeature([Experience, ExperienceRepository]),
     forwardRef(() => SharedModule),
   ],
   exports: [UserService],
   providers: [UserService],
-  controllers: [UserController, RecruiterController, StudentController],
+  controllers: [UserController, RecruiterController, StudentController, AdminController],
 })
 export class UserModule {}

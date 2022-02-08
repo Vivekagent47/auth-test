@@ -21,6 +21,7 @@ import { RolesGuard, Roles, AuthUser } from '../utils';
 // import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserRole } from '.';
 import { KycDto } from './dto/kyc.dto';
+import { AdminDto } from '../auth/dto/create-admin.dto';
 
 /**
  * User controller
@@ -164,18 +165,7 @@ export class RecruiterController {
     }
   }
 
-  @Put('/verifykyc/:id')
-  @ApiBearerAuth()
-  @UseGuards(RolesGuard)
-  @Roles('admin')
-  @UseInterceptors(ClassSerializerInterceptor)
-  async verifyKyc(@Param('id') id: string) {
-    try {
-      return await this.service.verifyKyc(id);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
+
 }
 
 @Controller('student')
@@ -190,6 +180,41 @@ export class StudentController {
   async getStudentProfile(@Param('id') id: string) {
     try {
       return await this.service.getStudentProfile(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+}
+
+
+@Controller('admin')
+@Roles('admin')
+@UseInterceptors(ClassSerializerInterceptor)
+export class AdminController {
+  constructor(private readonly service: UserService) {}
+
+  @Get('/dashboard')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  async getDashboardDetails() {}
+
+  @Get('/companies')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  async getCompanies(@AuthUser() user: User) {
+    if(user.roles[0] === 'admin') {
+      return await this.service.getAllCompanies();
+    }
+    throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+  }
+
+  @Put('/verifykyc/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async verifyKyc(@Param('id') id: string) {
+    try {
+      return await this.service.verifyKyc(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
