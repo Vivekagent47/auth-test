@@ -13,8 +13,10 @@ import { Company } from './company.entity';
 import { KycDto } from './dto/kyc.dto';
 import { Education } from './education.entity';
 import { Experience } from './experience.entity';
-import { AdminDto } from 'src/auth/dto/create-admin.dto';
+import { AdminDto } from '../auth/dto/create-admin.dto';
 import { ConfigService } from '@nestjs/config';
+import { Internship } from '../internship/internship.entity';
+import { InternshipService } from '../internship/internship.service';
 
 /**
  * User service
@@ -23,6 +25,8 @@ import { ConfigService } from '@nestjs/config';
 export class UserService {
   constructor(
     private configService: ConfigService,
+
+    private internshipService: InternshipService,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -477,7 +481,7 @@ export class UserService {
 
   /**
    * get all the companies with verified kyc status
-   */ 
+   */
   async getAllCompanies(): Promise<Company[]> {
     try {
       const companies = await this.companyRepository
@@ -488,6 +492,33 @@ export class UserService {
       return companies;
     } catch (err) {
       throw new Error(err);
+    }
+  }
+
+  /**
+   * get count of companies, internships and students
+   */
+  async getDashboardDetails(): Promise<{
+    countCompanies: number;
+    countInternships: number;
+    countStudents: number;
+  }> {
+    try {
+      const countCompanies = await this.companyRepository.count({
+        kycStatus: true,
+      });
+
+      const countInternships = await this.internshipService.countInternships();
+
+      const countStudents = await this.studentRepository.count();
+
+      return {
+        countCompanies,
+        countInternships,
+        countStudents,
+      };
+    } catch (error) {
+      throw new Error(error);
     }
   }
 }

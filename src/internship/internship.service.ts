@@ -500,4 +500,13 @@ export class InternshipService {
       throw error;
     }
   }
+
+  /**
+   * get count of all internship
+   */ 
+  async countInternships() : Promise<number> {
+    return await this.internshipRepo.count({
+      isActive: true,
+    });
+  }
 }

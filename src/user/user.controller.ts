@@ -164,8 +164,6 @@ export class RecruiterController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
-
 }
 
 @Controller('student')
@@ -186,23 +184,46 @@ export class StudentController {
   }
 }
 
-
 @Controller('admin')
 @Roles('admin')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AdminController {
   constructor(private readonly service: UserService) {}
 
+  /**
+   * Dashboard will have
+   * - total number of companies
+   * - total number of students
+   * - total number of internships
+   * - Views
+   * - application rate
+   */
   @Get('/dashboard')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
-  async getDashboardDetails() {}
+  async getDashboardDetails() {
+    try {
+      const { countCompanies, countInternships, countStudents } =
+        await this.service.getDashboardDetails();
+
+      return {
+        companies: countCompanies,
+        internships: countInternships,
+        students: countStudents,
+        //! views: views,
+        //! applicationRate: applicationRate,
+        //! Hired: Hired,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 
   @Get('/companies')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   async getCompanies(@AuthUser() user: User) {
-    if(user.roles[0] === 'admin') {
+    if (user.roles[0] === 'admin') {
       return await this.service.getAllCompanies();
     }
     throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
