@@ -168,4 +168,23 @@ export class InternshipController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Post('/click/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async clickInternship(
+    @Headers('authorization') token: string,
+    @Param('id') id: string,
+  ): Promise<{ success: boolean; message: string }>{
+    try{
+      return this.service.addInternshipClick(token,id)
+    }catch(error){
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }
+
+
+

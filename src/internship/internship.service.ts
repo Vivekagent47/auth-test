@@ -509,4 +509,8 @@ export class InternshipService {
       isActive: true,
     });
   }
+
+  async addInternshipClick(token:string,id:string) : Promise<any> {
+    
+  }
 }
