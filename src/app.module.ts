@@ -16,8 +16,8 @@ import { JwtTokenMiddleware, LoggerInterceptor } from './utils';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import * as ormConfig from './orm.config';
-import { JWT_SECRET } from './config';
+import config from './ormconfig';
+// import { JWT_SECRET } from './config';
 import { ConfigModule } from '@nestjs/config';
 
 
@@ -26,9 +26,9 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot(ormConfig),
+    TypeOrmModule.forRoot(config),
     JwtModule.register({
-      secret: JWT_SECRET,
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '60s' },
     }),
     WinstonModule.forRoot(loggerConf),

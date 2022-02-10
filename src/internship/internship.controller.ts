@@ -12,6 +12,7 @@ import {
   HttpStatus,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Patch,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -31,6 +32,7 @@ export class InternshipController {
   constructor(private readonly service: InternshipService) {}
 
   @Get()
+  @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
   async getPanginatedInternship(
     @Headers('authorization') token: string,
@@ -63,13 +65,16 @@ export class InternshipController {
     }
   }
 
-  @Get('/activeAll')
+  @Get('/bystatus')
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getInternshipByAllActive(
+  async getInternshipByStatus (
     @Headers('authorization') token: string,
+    @Param('status') status: string,
   ): Promise<Internship[]> {
     try {
-      return await this.service.getInternshipByAllActive(token);
+      return await this.service.getInternshipByStatus(token, status);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -121,7 +126,7 @@ export class InternshipController {
     }
   }
 
-  @Put('/activate/:id')
+  @Patch('/activate/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('admin')
@@ -136,12 +141,12 @@ export class InternshipController {
     }
   }
 
-  @Put('/deactivate/:id')
+  @Patch('/deactivate/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
-  async deactiveInternship(
+  async deactivateInternship(
     @Headers('authorization') token: string,
     @Param('id') id: string,
   ): Promise<{ success: boolean; message: string }> {

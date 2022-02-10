@@ -1,0 +1,18 @@
+version: '2'
+services:
+  db:
+    container_name: mysql
+    image: mysql:latest
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./data/mysql:/data/mysql
+    env_file:
+      - docker.env
+
+  web:
+    image: bhargavgohil/skillzen:1
+    depends_on:
+      - db
+    ports:
+      - '5000:5000'

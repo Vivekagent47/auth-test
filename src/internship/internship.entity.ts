@@ -195,9 +195,15 @@ export class Internship {
   @Column()
   prePlacementOffer: boolean;
 
-  @Column({ name: 'view_count' })
+  @Column({ name: 'view_count', default: 0 })
   viewCount: number;
 
-  @Column({ name: 'apply_rate' })
+  @Column({ name: 'apply_rate', default: 0 })
   applyRate: number;
+
+  @Column()
+  contactPerson: string;
+
+  @Column()
+  contactNumber: string;
 }

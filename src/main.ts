@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import 'dotenv/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -27,6 +28,6 @@ async function bootstrap() {
    * to dto class & checks validity
    */
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  await app.listen(8800);
+  await app.listen(process.env.PORT || 8800);
 }
 bootstrap();

@@ -124,6 +124,8 @@ export class InternshipService {
         if (user.roles.includes('admin')) {
           internship.isActive = true;
         } else if (user.userType === 'recruiter') {
+          internship.contactPerson = user.firstName + ' ' + user.lastName;
+          internship.contactNumber = user.mobileNumber;
           internship.isActive = false;
         }
 
@@ -230,7 +232,7 @@ export class InternshipService {
   /**
    * get all active internship
    */
-  async getInternshipByAllActive(token: string): Promise<Internship[]> {
+  async getInternshipByStatus(token: string, status: string): Promise<Internship[]> {
     let payload: any, user: any;
     if (token) {
       try {
@@ -240,12 +242,15 @@ export class InternshipService {
         throw new Error('Invalid token');
       }
     }
+    const activeStatus: Boolean =  status === 'active' ? true : false;
 
     const data = await this.internshipRepo
       .createQueryBuilder()
       .orderBy('createdAt', 'DESC')
-      .andHaving('isActive = :isActive', { isActive: true })
+      .andHaving('isActive = :isActive', { isActive: activeStatus })
       .getMany();
+
+    console.log(data);
 
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
