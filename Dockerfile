@@ -2,11 +2,11 @@ FROM node:14 as builder
 WORKDIR /bhargav/app
 COPY package*.json ./
 
-COPY ./src/ormconfig.docker.ts ./src/ormconfig.ts
 RUN npm install -g npm
 RUN npm install
 COPY . .
 
+COPY ./src/ormconfig.docker.ts ./src/ormconfig.ts
 RUN npm run build
 
 FROM node:14

@@ -5,15 +5,15 @@ const config: ConnectionOptions = {
   type: 'mysql',
   host: 'db',
   port: 3306,
-  username: 'root',
-  password: 'root',
+  username: 'dbuser',
+  password: 'dbuser',
   database: 'skillzen',
-  entities: [__dirname + 'dist/src/**/*.entity{.ts,.js}'],
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: true,
-  migrations: [__dirname + 'dist/src/migrations/*{.ts,.js}'],
-  cli: {
-    migrationsDir: 'dist/src/migrations',
-  },
+  // migrations: [__dirname + '/migrations/*{.ts,.js}'],
+  // cli: {
+  //   migrationsDir: '/migrations',
+  // },
 };
 
 export default config;
