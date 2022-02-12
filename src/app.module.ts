@@ -20,7 +20,7 @@ import config from './ormconfig';
 // import { JWT_SECRET } from './config';
 import { ConfigModule } from '@nestjs/config';
 
-console.log(config);
+// console.log(config);
 @Module({
   imports: [
     ConfigModule.forRoot({

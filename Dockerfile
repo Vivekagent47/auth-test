@@ -17,7 +17,7 @@ RUN npm install
 
 COPY --from=builder /bhargav/app/dist ./dist
 
-COPY .env .
+COPY .env ./dist
 
 EXPOSE 8800
 

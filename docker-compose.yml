@@ -27,7 +27,13 @@ services:
     image: bhargavgohil/skillzen:1
     depends_on:
       - db
+    # added command because the db container was not running when the web container was started
+    # so added the delay to wait for the db container to start 
     command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; node dist/main'
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT}
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
     ports:
       - '8800:8800'
     networks:
