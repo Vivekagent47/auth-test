@@ -24,7 +24,7 @@ services:
       - docker.env
 
   web:
-    image: bhargavgohil/skillzen:1
+    image: bhargavgohil/skilzen:1.1
     depends_on:
       - db
     # added command because the db container was not running when the web container was started
