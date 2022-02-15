@@ -45,6 +45,9 @@ export class AuthService {
   async login(credential: LoginCredential): Promise<any> {
     const user = await this.userService.getUserByEmail(credential.email);
 
+    // console.log(process.env.JWT_SECRET);
+    // console.log(user);
+
     if (!user) {
       throw new Error('Invalid credentials');
     }
@@ -64,6 +67,7 @@ export class AuthService {
     delete user.password;
 
     const authToken: TokenDto = this.generateAuthToken(user);
+    // console.log(authToken);
     return Promise.resolve({ authToken, user });
   }
 

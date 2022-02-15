@@ -164,6 +164,20 @@ export class RecruiterController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Get('/dashboard')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getRecruiterDashboard(@AuthUser() user : User) {
+    try {
+      return await this.service.getRecruiterDashboard(user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
 }
 
 @Controller('student')

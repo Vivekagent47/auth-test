@@ -24,7 +24,7 @@ export class JwtTokenMiddleware implements NestMiddleware {
       if (isTokenValid) {
         const payload: any = this.getTokenPayload(token);
         
-        console.log('payload', payload);
+        // console.log('payload', payload);
 
         req.locals.user = {
           id: payload.userId,

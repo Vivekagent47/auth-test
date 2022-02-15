@@ -13,7 +13,7 @@ import { CreateInternshipDto } from './dto/create-internship.dto';
 import { PaginatedResultDto } from './dto/paginatedResult.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { Internship } from './internship.entity';
-import { UserService } from '../user';
+import { User, UserService } from '../user';
 import { ApplyInternshipDto } from './dto/apply-internship.dto';
 import { ApplyInternship } from './applyinternship.entity';
 
@@ -268,7 +268,20 @@ export class InternshipService {
   /**
    * get All the internship
    */
-  async getAllInternships(token: string): Promise<Internship[]> {
+  async getAllInternships(token: string, paginationData: PaginationDto): Promise<PaginatedResultDto> {
+
+    const skippedItems = (paginationData.page - 1) * paginationData.limit;
+
+    const totalCount = await this.internshipRepo.count();
+
+    const totalPages = Math.ceil(totalCount / paginationData.limit);
+    const nextPage =
+      paginationData.page + 1 <= totalPages
+        ? paginationData.page + 1
+        : totalPages;
+    const prevPage = paginationData.page - 1 >= 1 ? paginationData.page - 1 : 1;
+
+
     let payload: any;
     try {
       payload = this.jwtService.verify(token.split(' ')[1]);
@@ -290,13 +303,24 @@ export class InternshipService {
       const data = await this.internshipRepo
         .createQueryBuilder()
         .orderBy('createdAt', 'DESC')
+        .offset(skippedItems)
+        .limit(paginationData.limit)
         .getMany();
 
       for (let i = 0; i < data.length; i++) {
         data[i].questions = JSON.parse(data[i].questions);
         data[i].numberOfApplicants = data[i].applicant.length;
       }
-      return data;
+      
+      return {
+        totalCount,
+        totalPages,
+        nextPage,
+        prevPage,
+        currPage: paginationData.page,
+        limit: paginationData.limit,
+        data: data,
+      }
     } else {
       throw new HttpException(
         'You are not authorized to view all internship',
@@ -308,23 +332,15 @@ export class InternshipService {
   /**
    * gel internship by ID
    */
-  async getInternshipById(token: string, id: string): Promise<Internship> {
-    let payload: any, user: any;
-    if (token) {
-      try {
-        payload = await this.jwtService.verify(token.split(' ')[1]);
-        user = await this.userService.getUserById(payload.userId);
-      } catch (err) {
-        throw new Error('Invalid token');
-      }
-    }
+  async getInternshipById(userPayload : User, id: string): Promise<Internship> {
+
+    const user = await this.userService.getUserById(userPayload.id);
 
     const data = await this.internshipRepo.findOne(id);
     data.questions = JSON.parse(data.questions);
     data.numberOfApplicants = data.applicant.length;
-    if (!token) {
-      delete data.applicant;
-    } else if (user.userType === 'student') {
+
+    if (user.userType === 'student') {
       delete data.applicant;
     }
     return data;
@@ -469,6 +485,7 @@ export class InternshipService {
       if (!user.isActive) {
         throw new Error('Inactive user');
       }
+      // check if he has already applied for this internship
 
       for (let i = 0; i < internship.applicant.length; i++) {
         const applicant = await this.applyInternshipRepo.findOne(

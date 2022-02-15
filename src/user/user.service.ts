@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -521,4 +521,39 @@ export class UserService {
       throw new Error(error);
     }
   }
+
+  async getRecruiterDashboard(user : User) : Promise<any>{
+    const { userprofile , profile } = await this.getUserById(user.id);
+
+    // check the user is a recruiter or not
+
+    if(userprofile.userType !== 'recruiter'){
+      throw new UnauthorizedException('Not allowed to access this route');
+    }
+
+    // get the count of posted internships
+
+    const countInternships = profile.postedInternship.length;
+    
+    // get all the internship id's from the profile.
+    // and count all the applicants for each internship as totalApplicants
+
+    // const totalApplicants = await profile.postedInternship.reduce(async (acc : number, internshipId : string) => {
+    //   const internship = await this.internshipService.getInternshipById(user, internshipId);
+    //   return acc + internship.applicant.length;
+    // })
+
+    let totalApplicants : number = 0;
+
+    for(const internhipId of profile.postedInternship) {
+      const internship = await this.internshipService.getInternshipById(user, internhipId);
+      totalApplicants += internship.applicant.length;
+    }
+
+    return {
+      countInternships,
+      totalApplicants
+    }
+  }
+
 }

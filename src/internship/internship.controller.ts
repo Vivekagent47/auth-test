@@ -17,12 +17,13 @@ import {
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { Internship } from './internship.entity';
-import { RolesGuard, Roles } from '../utils';
+import { RolesGuard, Roles, AuthUser } from '../utils';
 import { InternshipService } from './internship.service';
 import { PaginationDto } from './dto/pagination.dto';
 import { PaginatedResultDto } from './dto/paginatedResult.dto';
 import { CreateInternshipDto } from './dto/create-internship.dto';
 import { ApplyInternshipDto } from './dto/apply-internship.dto';
+import { User } from '../user/user.entity';
 
 /**
  * Internship Controller
@@ -57,9 +58,13 @@ export class InternshipController {
   @UseInterceptors(ClassSerializerInterceptor)
   async getAllInternships(
     @Headers('authorization') token: string,
-  ): Promise<Internship[]> {
+    @Query() data: PaginationDto,
+  ): Promise<PaginatedResultDto> {
     try {
-      return await this.service.getAllInternships(token);
+      return await this.service.getAllInternships(token, {
+        ...data,
+        limit: data.limit > 18 ? 18 : data.limit,
+      });
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -83,11 +88,12 @@ export class InternshipController {
   @Get('/:id')
   @UseInterceptors(ClassSerializerInterceptor)
   async getOneInternship(
-    @Headers('authorization') token: string,
+    // @Headers('authorization') token: string,
+    @AuthUser() user: User,
     @Param('id') id: string,
   ): Promise<Internship> {
     try {
-      return await this.service.getInternshipById(token, id);
+      return await this.service.getInternshipById(user, id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -168,6 +174,7 @@ export class InternshipController {
     @Body() data: ApplyInternshipDto,
   ): Promise<{ success: boolean; message: string }> {
     try {
+      console.log(data);
       return await this.service.applyInternship(token, id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
