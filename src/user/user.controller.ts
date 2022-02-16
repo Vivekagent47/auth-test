@@ -12,6 +12,7 @@ import {
   HttpException,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -22,6 +23,8 @@ import { RolesGuard, Roles, AuthUser } from '../utils';
 import { UserRole } from '.';
 import { KycDto } from './dto/kyc.dto';
 import { AdminDto } from '../auth/dto/create-admin.dto';
+import { PaginationDto } from './dto/pagination.dto';
+import { PaginatedResultDto } from './dto/pagination-result.dto';
 
 /**
  * User controller
@@ -170,7 +173,7 @@ export class RecruiterController {
   @UseGuards(RolesGuard)
   @Roles('user')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getRecruiterDashboard(@AuthUser() user : User) {
+  async getRecruiterDashboard(@AuthUser() user: User) {
     try {
       return await this.service.getRecruiterDashboard(user);
     } catch (error) {
@@ -178,6 +181,21 @@ export class RecruiterController {
     }
   }
 
+  @Get('/applicants')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getAllApplicants(
+    @AuthUser() user: User,
+    // @Query() data: PaginationDto,
+  ): Promise<any> {
+    try {
+      return await this.service.getAllApplicants(user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }
 
 @Controller('student')

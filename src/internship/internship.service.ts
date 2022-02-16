@@ -523,6 +523,15 @@ export class InternshipService {
     }
   }
 
+  async getApplyInternship(id : string) {
+    const applyInternship = await this.applyInternshipRepo.findOne(id);
+    if(!applyInternship) {
+      throw new HttpException('No such application found', HttpStatus.NOT_FOUND);
+    }
+
+    return applyInternship;
+  }
+
   /**
    * get count of all internship
    */ 

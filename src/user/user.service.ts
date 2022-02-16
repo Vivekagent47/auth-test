@@ -17,6 +17,7 @@ import { AdminDto } from '../auth/dto/create-admin.dto';
 import { ConfigService } from '@nestjs/config';
 import { Internship } from '../internship/internship.entity';
 import { InternshipService } from '../internship/internship.service';
+import { PaginationDto } from './dto/pagination.dto';
 
 /**
  * User service
@@ -523,17 +524,17 @@ export class UserService {
   }
 
   async getRecruiterDashboard(user : User) : Promise<any>{
-    const { userprofile , profile } = await this.getUserById(user.id);
+    const userPayload = await this.getUserById(user.id);
 
     // check the user is a recruiter or not
 
-    if(userprofile.userType !== 'recruiter'){
+    if(userPayload.userType !== 'recruiter'){
       throw new UnauthorizedException('Not allowed to access this route');
     }
 
     // get the count of posted internships
 
-    const countInternships = profile.postedInternship.length;
+    const countInternships = userPayload.profile.postedInternship.length;
     
     // get all the internship id's from the profile.
     // and count all the applicants for each internship as totalApplicants
@@ -544,15 +545,43 @@ export class UserService {
     // })
 
     let totalApplicants : number = 0;
+    let totalViews : number = 0;
 
-    for(const internhipId of profile.postedInternship) {
+
+    for(const internhipId of userPayload.profile.postedInternship) {
       const internship = await this.internshipService.getInternshipById(user, internhipId);
       totalApplicants += internship.applicant.length;
+      totalViews += internship.viewCount;
     }
 
     return {
       countInternships,
-      totalApplicants
+      totalApplicants,
+      totalViews
+    }
+  }
+
+  async getAllApplicants(userPayload : User) {
+
+    const user = await this.getUserById(userPayload.id);
+    
+    if(user.userType !== 'recruiter'){
+      throw new UnauthorizedException('Not allowed to access this route');
+    }
+
+    let data = [];
+
+    for(const internhipId of user.profile.postedInternship) {
+      const internship = await this.internshipService.getInternshipById(user, internhipId);
+      for(const applicant of internship.applicant) {
+        const { userId } = await this.internshipService.getApplyInternship(applicant);
+        const studentUser = await this.getUserById(userId);
+        data.push(studentUser);
+      }
+    }
+
+    return {
+      data
     }
   }
 
