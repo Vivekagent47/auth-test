@@ -30,7 +30,7 @@ import { User } from '../user/user.entity';
  */
 @Controller('internship')
 export class InternshipController {
-  constructor(private readonly service: InternshipService) {}
+  constructor(private readonly internshipService: InternshipService) {}
 
   @Get()
   @Roles('admin', 'user')
@@ -42,7 +42,7 @@ export class InternshipController {
     data.page = Number(data.page);
     data.limit = Number(data.limit ? data.limit : 18);
 
-    return await this.service.getInternships(
+    return await this.internshipService.getInternships(
       {
         ...data,
         limit: data.limit > 18 ? 18 : data.limit,
@@ -61,7 +61,7 @@ export class InternshipController {
     @Query() data: PaginationDto,
   ): Promise<PaginatedResultDto> {
     try {
-      return await this.service.getAllInternships(token, {
+      return await this.internshipService.getAllInternships(token, {
         ...data,
         limit: data.limit > 18 ? 18 : data.limit,
       });
@@ -79,7 +79,7 @@ export class InternshipController {
     @Param('status') status: string,
   ): Promise<Internship[]> {
     try {
-      return await this.service.getInternshipByStatus(token, status);
+      return await this.internshipService.getInternshipByStatus(token, status);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -93,7 +93,7 @@ export class InternshipController {
     @Param('id') id: string,
   ): Promise<Internship> {
     try {
-      return await this.service.getInternshipById(user, id);
+      return await this.internshipService.getInternshipById(user, id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -109,7 +109,7 @@ export class InternshipController {
     @Body() data: CreateInternshipDto,
   ): Promise<Internship> {
     try {
-      return await this.service.createInternship(token, data);
+      return await this.internshipService.createInternship(token, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -126,7 +126,7 @@ export class InternshipController {
     @Body() data: CreateInternshipDto,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      return await this.service.updateInternship(token, id, data);
+      return await this.internshipService.updateInternship(token, id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -141,7 +141,7 @@ export class InternshipController {
     @Param('id') id: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      return await this.service.activateInternship(id);
+      return await this.internshipService.activateInternship(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -157,7 +157,7 @@ export class InternshipController {
     @Param('id') id: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      return await this.service.deactivateInternship(id, token);
+      return await this.internshipService.deactivateInternship(id, token);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -175,7 +175,7 @@ export class InternshipController {
   ): Promise<{ success: boolean; message: string }> {
     try {
       console.log(data);
-      return await this.service.applyInternship(token, id, data);
+      return await this.internshipService.applyInternship(token, id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -191,7 +191,7 @@ export class InternshipController {
     @Param('id') id: string,
   ): Promise<{ success: boolean; message: string }>{
     try{
-      return this.service.addInternshipClick(token,id)
+      return this.internshipService.addInternshipClick(token,id)
     }catch(error){
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

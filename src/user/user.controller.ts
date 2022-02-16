@@ -28,7 +28,7 @@ import { AdminDto } from '../auth/dto/create-admin.dto';
  */
 @Controller('user')
 export class UserController {
-  constructor(private readonly service: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   // trial current user
   // getting the current user from the request
@@ -48,7 +48,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   async getMe(@Param('id') id: string): Promise<any> {
     try {
-      return await this.service.getUserById(id);
+      return await this.userService.getUserById(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -64,7 +64,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   async getAllUser(): Promise<User[]> {
     try {
-      return await this.service.getAllUsers();
+      return await this.userService.getAllUsers();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -80,7 +80,7 @@ export class UserController {
   //   @Body() data: Partial<User>,
   // ): Promise<User> {
   //   try {
-  //     return await this.service.updateUser(id, data);
+  //     return await this.userService.updateUser(id, data);
   //   } catch (error) {
   //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   //   }
@@ -96,7 +96,7 @@ export class UserController {
   //   @Body() data: UpdatePasswordDto,
   // ): Promise<any> {
   //   try {
-  //     return await this.service.updatePassword(id, data);
+  //     return await this.userService.updatePassword(id, data);
   //   } catch (error) {
   //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   //   }
@@ -112,7 +112,7 @@ export class UserController {
     @Body() data: { roles: UserRole[] },
   ) {
     try {
-      return await this.service.updateRole(id, data);
+      return await this.userService.updateRole(id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -125,7 +125,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   async deleteUser(@Param('id') id: string): Promise<any> {
     try {
-      return await this.service.deleteUser(id);
+      return await this.userService.deleteUser(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -134,7 +134,7 @@ export class UserController {
 
 @Controller('recruiter')
 export class RecruiterController {
-  constructor(private readonly service: UserService) {}
+  constructor(private readonly recruiterService: UserService) {}
 
   @Get('/kyc/:id')
   @ApiBearerAuth()
@@ -143,7 +143,7 @@ export class RecruiterController {
   @UseInterceptors(ClassSerializerInterceptor)
   async getKycDeatils(@Param('id') id: string) {
     try {
-      return await this.service.getKycDeatils(id);
+      return await this.recruiterService.getKycDeatils(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -159,7 +159,7 @@ export class RecruiterController {
     @Body() data: KycDto,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      return await this.service.applyKyc(token, data);
+      return await this.recruiterService.applyKyc(token, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -172,7 +172,7 @@ export class RecruiterController {
   @UseInterceptors(ClassSerializerInterceptor)
   async getRecruiterDashboard(@AuthUser() user : User) {
     try {
-      return await this.service.getRecruiterDashboard(user);
+      return await this.recruiterService.getRecruiterDashboard(user);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -182,7 +182,7 @@ export class RecruiterController {
 
 @Controller('student')
 export class StudentController {
-  constructor(private readonly service: UserService) {}
+  constructor(private readonly studentService: UserService) {}
 
   @Get('/profile/:id')
   @ApiBearerAuth()
@@ -191,7 +191,7 @@ export class StudentController {
   @UseInterceptors(ClassSerializerInterceptor)
   async getStudentProfile(@Param('id') id: string) {
     try {
-      return await this.service.getStudentProfile(id);
+      return await this.studentService.getStudentProfile(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -202,7 +202,7 @@ export class StudentController {
 @Roles('admin')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AdminController {
-  constructor(private readonly service: UserService) {}
+  constructor(private readonly adminService: UserService) {}
 
   /**
    * Dashboard will have
@@ -218,7 +218,7 @@ export class AdminController {
   async getDashboardDetails() {
     try {
       const { countCompanies, countInternships, countStudents } =
-        await this.service.getDashboardDetails();
+        await this.adminService.getDashboardDetails();
 
       return {
         companies: countCompanies,
@@ -238,7 +238,7 @@ export class AdminController {
   @UseGuards(RolesGuard)
   async getCompanies(@AuthUser() user: User) {
     if (user.roles[0] === 'admin') {
-      return await this.service.getAllCompanies();
+      return await this.adminService.getAllCompanies();
     }
     throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
   }
@@ -249,7 +249,7 @@ export class AdminController {
   @UseInterceptors(ClassSerializerInterceptor)
   async verifyKyc(@Param('id') id: string) {
     try {
-      return await this.service.verifyKyc(id);
+      return await this.adminService.verifyKyc(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
