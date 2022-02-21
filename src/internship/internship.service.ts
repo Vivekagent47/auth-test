@@ -467,19 +467,13 @@ export class InternshipService {
    * Apply Internship
    */
   async applyInternship(
-    token: string,
+    incomingUser: User,
     id: string,
     data: ApplyInternshipDto,
   ): Promise<any> {
-    let payload: any;
-    try {
-      payload = this.jwtService.verify(token.split(' ')[1]);
-    } catch (err) {
-      throw new Error('Invalid token');
-    }
 
     const internship = await this.internshipRepo.findOne(id);
-    const user = await this.userService.getUserById(payload.userId);
+    const user = await this.userService.getUserById(incomingUser.id);
 
     try {
       if (!user.isActive) {
@@ -491,14 +485,14 @@ export class InternshipService {
         const applicant = await this.applyInternshipRepo.findOne(
           internship.applicant[i],
         );
-        if (applicant.userId === payload.userId) {
+        if (applicant && applicant.userId === user.id) {
           throw new Error('You have already applied for this internship');
         }
       }
 
       if (user.userType === 'student') {
         const newApplication = new ApplyInternship();
-        newApplication.userId = payload.userId;
+        newApplication.userId = user.id;
         newApplication.answers = this.jsonToString(data.answers);
 
         const applyData = await this.applyInternshipRepo.save(newApplication);
@@ -506,7 +500,7 @@ export class InternshipService {
         internship.applicant.push(applyData.id);
         await this.internshipRepo.save(internship);
 
-        await this.userService.applieInternship(payload.userID, internship.id);
+        await this.userService.applieInternship(user.id, internship.id);
 
         return {
           success: true,

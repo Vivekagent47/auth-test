@@ -169,13 +169,13 @@ export class InternshipController {
   @Roles('user')
   @UseInterceptors(ClassSerializerInterceptor)
   async applyInternship(
-    @Headers('authorization') token: string,
+    @AuthUser() user: User,
     @Param('id') id: string,
     @Body() data: ApplyInternshipDto,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      console.log(data);
-      return await this.internshipService.applyInternship(token, id, data);
+      // console.log(data);
+      return await this.internshipService.applyInternship(user, id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

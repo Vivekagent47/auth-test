@@ -191,7 +191,7 @@ export class RecruiterController {
     // @Query() data: PaginationDto,
   ): Promise<any> {
     try {
-      return await this.service.getAllApplicants(user);
+      return await this.recruiterService.getAllApplicants(user);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
