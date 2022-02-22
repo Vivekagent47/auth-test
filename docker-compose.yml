@@ -14,14 +14,8 @@ services:
     networks:
       - app-tier
 
-    # volumes:
-    #   - db-data:/var/lib/mysql
-    # environment:
-    #   MYSQL_ROOT_HOST: '%'
-    #   MYSQL_ROOT_PASSWORD: 'rootpassword'
-    #   MYSQL_DATABASE: 'skillzen'
-    #   MYSQL_USER: 'dbuser'
-    #   MYSQL_PASSWORD: 'dbpassword'
+    volumes:
+      - db-data:/var/lib/mysql
     env_file:
       - docker.env
 
@@ -40,3 +34,5 @@ services:
       - '8800:8800'
     networks:
       - app-tier
+volumes:
+  db-data:
