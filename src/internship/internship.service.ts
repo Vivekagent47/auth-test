@@ -232,7 +232,10 @@ export class InternshipService {
   /**
    * get all active internship
    */
-  async getInternshipByStatus(token: string, status: string): Promise<Internship[]> {
+  async getInternshipByStatus(
+    token: string,
+    status: string,
+  ): Promise<Internship[]> {
     let payload: any, user: any;
     if (token) {
       try {
@@ -242,7 +245,7 @@ export class InternshipService {
         throw new Error('Invalid token');
       }
     }
-    const activeStatus: Boolean =  status === 'active' ? true : false;
+    const activeStatus: Boolean = status === 'active' ? true : false;
 
     const data = await this.internshipRepo
       .createQueryBuilder()
@@ -250,7 +253,7 @@ export class InternshipService {
       .andHaving('isActive = :isActive', { isActive: activeStatus })
       .getMany();
 
-    console.log(data);
+    // console.log(data);
 
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
@@ -268,8 +271,10 @@ export class InternshipService {
   /**
    * get All the internship
    */
-  async getAllInternships(token: string, paginationData: PaginationDto): Promise<PaginatedResultDto> {
-
+  async getAllInternships(
+    token: string,
+    paginationData: PaginationDto,
+  ): Promise<PaginatedResultDto> {
     const skippedItems = (paginationData.page - 1) * paginationData.limit;
 
     const totalCount = await this.internshipRepo.count();
@@ -280,7 +285,6 @@ export class InternshipService {
         ? paginationData.page + 1
         : totalPages;
     const prevPage = paginationData.page - 1 >= 1 ? paginationData.page - 1 : 1;
-
 
     let payload: any;
     try {
@@ -311,7 +315,7 @@ export class InternshipService {
         data[i].questions = JSON.parse(data[i].questions);
         data[i].numberOfApplicants = data[i].applicant.length;
       }
-      
+
       return {
         totalCount,
         totalPages,
@@ -320,7 +324,7 @@ export class InternshipService {
         currPage: paginationData.page,
         limit: paginationData.limit,
         data: data,
-      }
+      };
     } else {
       throw new HttpException(
         'You are not authorized to view all internship',
@@ -329,11 +333,18 @@ export class InternshipService {
     }
   }
 
+  async getRawInternships() {
+    return await this.internshipRepo
+      .createQueryBuilder()
+      .orderBy('createdAt', 'DESC')
+      .andHaving('isActive = :isActive', { isActive: true })
+      .getMany();
+  }
+
   /**
    * gel internship by ID
    */
-  async getInternshipById(userPayload : User, id: string): Promise<Internship> {
-
+  async getInternshipById(userPayload: User, id: string): Promise<Internship> {
     const user = await this.userService.getUserById(userPayload.id);
 
     const data = await this.internshipRepo.findOne(id);
@@ -471,7 +482,6 @@ export class InternshipService {
     id: string,
     data: ApplyInternshipDto,
   ): Promise<any> {
-
     const internship = await this.internshipRepo.findOne(id);
     const user = await this.userService.getUserById(incomingUser.id);
 
@@ -517,10 +527,13 @@ export class InternshipService {
     }
   }
 
-  async getApplyInternship(id : string) {
+  async getApplyInternship(id: string) {
     const applyInternship = await this.applyInternshipRepo.findOne(id);
-    if(!applyInternship) {
-      throw new HttpException('No such application found', HttpStatus.NOT_FOUND);
+    if (!applyInternship) {
+      throw new HttpException(
+        'No such application found',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return applyInternship;
@@ -528,14 +541,20 @@ export class InternshipService {
 
   /**
    * get count of all internship
-   */ 
-  async countInternships() : Promise<number> {
+   */
+  async countInternships(): Promise<number> {
     return await this.internshipRepo.count({
       isActive: true,
     });
   }
 
-  async addInternshipClick(token:string,id:string) : Promise<any> {
-    
+  async addInternshipClick(token: string, id: string): Promise<any> {}
+
+  async getViews(id: string): Promise<any> {
+    return this.internshipRepo
+      .createQueryBuilder('internship')
+      .where('internship.id = :id', { id: id })
+      .select('internship.views')
+      .getRawOne();
   }
 }

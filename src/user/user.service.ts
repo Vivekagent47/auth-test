@@ -503,6 +503,7 @@ export class UserService {
     countCompanies: number;
     countInternships: number;
     countStudents: number;
+    viewsCount: number;
   }> {
     try {
       const countCompanies = await this.companyRepository.count({
@@ -513,10 +514,20 @@ export class UserService {
 
       const countStudents = await this.studentRepository.count();
 
+      const internships = await this.internshipService.getRawInternships();
+
+      let viewsCount = 0;
+
+      for(let internship of internships) {
+        const views = await this.internshipService.getViews(internship.id);
+        viewsCount += views;
+      }
+
       return {
         countCompanies,
         countInternships,
         countStudents,
+        viewsCount
       };
     } catch (error) {
       throw new Error(error);
