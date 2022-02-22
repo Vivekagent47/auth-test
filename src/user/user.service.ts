@@ -564,11 +564,14 @@ export class UserService {
       totalApplicants += internship.applicant.length;
       totalViews += internship.viewCount;
     }
+    
+    const applicationRate = (countInternships/totalApplicants)*100
 
     return {
       countInternships,
       totalApplicants,
-      totalViews
+      totalViews,
+      applicationRate
     }
   }
 
