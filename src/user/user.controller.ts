@@ -235,15 +235,14 @@ export class AdminController {
   @UseGuards(RolesGuard)
   async getDashboardDetails() {
     try {
-      const { countCompanies, countInternships, countStudents, viewsCount } =
+      const { countCompanies, countInternships, countStudents, countApplicationRate } =
         await this.adminService.getDashboardDetails();
 
       return {
         companies: countCompanies,
         internships: countInternships,
         students: countStudents,
-        viewsCount: viewsCount,
-        //! applicationRate: applicationRate,
+        applicationRate: countApplicationRate,
         //! Hired: Hired,
       };
     } catch (error) {

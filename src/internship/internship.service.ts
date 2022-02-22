@@ -554,7 +554,7 @@ export class InternshipService {
     return this.internshipRepo
       .createQueryBuilder('internship')
       .where('internship.id = :id', { id: id })
-      .select('internship.views')
+      .select('internship.viewCount')
       .getRawOne();
   }
 }
