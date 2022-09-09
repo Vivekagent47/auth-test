@@ -1,42 +1,21 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user.entity';
-import { Recruiter } from './recruiter.entity';
-import { Student } from './student.entity';
-import { Education } from './education.entity';
-import { Experience } from './experience.entity';
-import {
-  UserRepository,
-  StudentRepository,
-  RecruiterRepository,
-  CompanyRepository,
-  EducationRepository,
-  ExperienceRepository,
-} from './user.repository';
-import { UserService } from './user.service';
-import {
-  RecruiterController,
-  UserController,
-  StudentController,
-  AdminController,
-} from './user.controller';
-import { Company } from './company.entity';
-import { SharedModule } from '../shared/shared.module';
-import { InternshipModule } from '../internship/internship.module';
+import { Module } from "@nestjs/common";
+import { UserService } from "./user.service";
+import { AuthController, UserController } from "./user.controller";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { User } from "../entities/user.entity";
+import { JwtModule } from "@nestjs/jwt";
+import { JwtStrategy } from "../utils";
+import "dotenv/config";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserRepository]),
-    TypeOrmModule.forFeature([Student, StudentRepository]),
-    TypeOrmModule.forFeature([Recruiter, RecruiterRepository]),
-    TypeOrmModule.forFeature([Company, CompanyRepository]),
-    TypeOrmModule.forFeature([Education, EducationRepository]),
-    TypeOrmModule.forFeature([Experience, ExperienceRepository]),
-    forwardRef(() => SharedModule),
-    InternshipModule
+    TypeOrmModule.forFeature([User]),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: "1h" },
+    }),
   ],
-  exports: [UserService],
-  providers: [UserService],
-  controllers: [UserController, RecruiterController, StudentController, AdminController],
+  controllers: [UserController, AuthController],
+  providers: [UserService, JwtStrategy],
 })
 export class UserModule {}

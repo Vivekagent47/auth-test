@@ -1,56 +1,31 @@
-import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { User, Profile } from "./entities";
+import { UserModule } from "./user/user.module";
 
-import { WinstonModule } from 'nest-winston';
-import { loggerConf } from './logger';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-
-import { SharedModule } from './shared/shared.module';
-import { UtilsModule } from './utils/utils.module';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { InternshipModule } from './internship/internship.module';
-
-import { JwtTokenMiddleware, LoggerInterceptor } from './utils';
-
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import config from './ormconfig';
-// import { JWT_SECRET } from './config';
-import { ConfigModule } from '@nestjs/config';
-
-// console.log(config);
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: "mysql",
+        host: configService.get("DATABASE_HOST"),
+        port: +configService.get("DATABASE_PORT"),
+        username: configService.get("DATABASE_USERNAME"),
+        password: configService.get("DATABASE_PASSWORD"),
+        database: configService.get("DATABASE_NAME"),
+        entities: [User, Profile],
+        synchronize: true,
+      }),
+      inject: [ConfigService],
     }),
-    TypeOrmModule.forRoot(config),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
-    }),
-    WinstonModule.forRoot(loggerConf),
-    AuthModule,
     UserModule,
-    SharedModule,
-    UtilsModule,
-    InternshipModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggerInterceptor,
-    },
-  ],
+  providers: [AppService],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(JwtTokenMiddleware)
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
-  }
-}
+export class AppModule {}
